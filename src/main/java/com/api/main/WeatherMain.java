@@ -46,6 +46,7 @@ public class WeatherMain {
 			
 			br = new BufferedReader(new InputStreamReader(httpUrlConnection.getInputStream(), "UTF-8"));
 			StringBuilder xmlBuilder = new StringBuilder();
+			StringBuilder resultBuilder = new StringBuilder();
 			String line = "";
 			
 			while((line = br.readLine()) != null) {
@@ -71,18 +72,23 @@ public class WeatherMain {
 			
 			expr = xPath.compile("//data/tmx");
 			nodeList = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
-			dailyWeather.add("최고 " + nodeList.item(0).getTextContent() + "도");
+			if(!nodeList.item(0).getTextContent().equals("-999.0")) {
+				dailyWeather.add("최고 " + nodeList.item(0).getTextContent() + "도");
+			}
 			
 			expr = xPath.compile("//data/tmn");
 			nodeList = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
-			dailyWeather.add("최저" + nodeList.item(0).getTextContent() + "도");
-			
+			if(!nodeList.item(0).getTextContent().equals("-999.0")) {
+				dailyWeather.add("최저" + nodeList.item(0).getTextContent() + "도");
+			}
 			expr = xPath.compile("//data");
 			nodeList = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
 			
 			dailyWeather.addAll(getWeather(nodeList));
-			
-			System.out.println(dailyWeather.toString());
+			for(String text : dailyWeather) {
+				resultBuilder.append(text+"\n");
+			}
+			resultBuilder.deleteCharAt(resultBuilder.length()-1);
 			
 			CloseableHttpClient httpClient = HttpClients.createDefault();
 			
@@ -93,10 +99,9 @@ public class WeatherMain {
 			httpPost.addHeader("Content-Type","application/x-www-form-urlencoded");
 			httpPost.addHeader("charset","EUC-KR");
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
-			params.add(new BasicNameValuePair("message", dailyWeather.toString()));
+			params.add(new BasicNameValuePair("message", resultBuilder.toString()));
 			httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
 			CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
-			System.out.println(httpResponse.getStatusLine().getStatusCode());
 		}catch (Exception e) {
 			// TODO: handle exception
 			e.printStackTrace();
