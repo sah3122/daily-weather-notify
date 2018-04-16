@@ -1,0 +1,6 @@
+/build/
+*.class
+*.settings
+*.project
+*.prefs
+

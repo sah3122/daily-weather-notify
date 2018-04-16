@@ -41,6 +41,7 @@ public class WeatherMain {
 		Document doc = null;
 		
 		try {
+			//날씨 정보 파싱
 			URL url = new URL(OPEN_API_URL);
 			HttpURLConnection httpUrlConnection = (HttpURLConnection) url.openConnection();
 			
@@ -92,14 +93,14 @@ public class WeatherMain {
 			
 			CloseableHttpClient httpClient = HttpClients.createDefault();
 			
-			String test = SEND_MESSAGE_URL;
-			
-			HttpPost httpPost = new HttpPost(test);
-			httpPost.addHeader("authorization", "Bearer ZsKRJojryupZVIX37aGflt7xHPel8ROE9JTgImKdlre");
+			HttpPost httpPost = new HttpPost(SEND_MESSAGE_URL);
+			//Line API KEY 설정
+			httpPost.addHeader("authorization", "Bearer LINE API KEY");
 			httpPost.addHeader("Content-Type","application/x-www-form-urlencoded");
-			httpPost.addHeader("charset","EUC-KR");
+			httpPost.addHeader("charset","UTF-8");
 			List<NameValuePair> params = new ArrayList<NameValuePair>();
 			params.add(new BasicNameValuePair("message", resultBuilder.toString()));
+			//한글 인코딩
 			httpPost.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
 			CloseableHttpResponse httpResponse = httpClient.execute(httpPost);
 		}catch (Exception e) {
